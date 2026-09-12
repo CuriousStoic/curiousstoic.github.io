@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Curious Stoic</title>
+  <script>
+    // Old links to the notes app still work: /daily-morning-notes/... -> /notes/...
+    var p = location.pathname;
+    if (p.indexOf("/daily-morning-notes") === 0) location.replace("/notes" + p.slice("/daily-morning-notes".length) + location.hash);
+  </script>
+  <style>body { font-family: Verdana, Arial, sans-serif; background: #fdf6e3; color: #2b2b2b; padding: 40px 16px; font-size: 19px; }</style>
+</head>
+<body>
+  <p>That page isn't here. <a href="/">Go to curiousstoic.com</a>.</p>
+</body>
+</html>
