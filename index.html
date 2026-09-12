@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Curious Stoic</title>
+  <style>
+    :root { --bg: #fdf6e3; --card: #fffdf7; --text: #2b2b2b; --muted: #6b6b6b; --accent: #2a6f97; --border: #e6dcc3; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: Verdana, Arial, sans-serif; font-size: 19px; line-height: 1.7; }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 40px 16px; }
+    h1 { font-size: 30px; margin: 0 0 4px; }
+    .tag { color: var(--muted); margin: 0 0 28px; }
+    a.app { display: flex; gap: 18px; align-items: center; text-decoration: none; color: inherit;
+            background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; margin: 14px 0; }
+    a.app:hover { border-color: var(--accent); }
+    .icon { width: 56px; height: 56px; flex: none; border-radius: 12px; background: var(--bg); border: 1px solid var(--border); }
+    .app h2 { margin: 0; font-size: 21px; color: var(--accent); }
+    .app p { margin: 2px 0 0; color: var(--muted); font-size: 16px; }
+    footer { color: var(--muted); font-size: 15px; margin-top: 40px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Curious Stoic</h1>
+    <p class="tag">Small apps for family and friends.</p>
+
+    <a class="app" href="/notes/">
+      <svg class="icon" viewBox="0 0 512 512" aria-hidden="true"><circle cx="256" cy="220" r="100" fill="#d4a017"/><rect x="72" y="290" width="368" height="34" fill="#2a6f97"/><rect x="72" y="356" width="300" height="34" fill="#2a6f97"/><rect x="72" y="422" width="220" height="34" fill="#2a6f97"/></svg>
+      <span><h2>Daily Morning Notes</h2><p>The weather, a note to each of you, and the Daily Stoic. One day at a time.</p></span>
+    </a>
+
+    <footer>curiousstoic.com</footer>
+  </div>
+</body>
+</html>
