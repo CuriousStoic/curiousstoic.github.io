@@ -13,7 +13,10 @@
     body { margin: 0; background: var(--bg); color: var(--text); font-family: "Nunito Sans", Arial, sans-serif; font-size: 18px; line-height: 1.7; letter-spacing: 0.01em; }
     .wrap { max-width: 1040px; margin: 0 auto; padding: 40px 16px; }
     h1 { font-size: 28px; margin: 0 0 4px; }
-    .tag { color: var(--muted); margin: 0 0 28px; }
+    .intro { max-width: 680px; margin: 8px 0 32px; }
+    .intro p { margin: 0 0 6px; }
+    .intro .lead { font-size: 22px; font-weight: 700; color: #2a6f97; margin-bottom: 10px; }
+    .tag { color: var(--muted); margin-top: 14px !important; }
     .apps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
     @media (max-width: 900px) { .apps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @media (max-width: 600px) { .apps { grid-template-columns: 1fr; } }
@@ -31,7 +34,12 @@
 <body>
   <div class="wrap">
     <h1>Curious Stoic</h1>
-    <p class="tag">Small apps for family and friends.</p>
+    <div class="intro">
+      <p class="lead">I learn by building.</p>
+      <p>My dyslexic mind learns best by making something I can see.</p>
+      <p>I learn across fields, build it beautifully, and share it for the common good.</p>
+      <p class="tag">Small apps, coded with Claude, for family and friends.</p>
+    </div>
 
     <div class="apps">
       <!-- Icons: Lucide (ISC licence), drawn inline -->
