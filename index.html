@@ -2,45 +2,72 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Curious Stoic</title>
+  <meta name="description" content="Curious Stoic: I learn by building. Small apps for family and friends.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    :root { --bg: #fdf6e3; --card: #fffdf7; --text: #2b2b2b; --muted: #5f5f5f; --border: #e6dcc3; }
+    :root { --bg: #f6f1e4; --card: rgba(255, 253, 247, 0.96); --text: #2b2b2b; --muted: #5f5f5f; --border: #e6dcc3;
+            --scrim: linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.02) 30%, rgba(0,0,0,0.30) 60%, rgba(0,0,0,0.66) 100%); }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--bg); color: var(--text); font-family: "Nunito Sans", Arial, sans-serif; font-size: 18px; line-height: 1.7; letter-spacing: 0.01em; }
-    .wrap { max-width: 1040px; margin: 0 auto; padding: 40px 16px; }
-    h1 { font-size: 28px; margin: 0 0 4px; }
-    .intro { max-width: 680px; margin: 8px 0 32px; }
-    .intro p { margin: 0 0 6px; }
-    .intro .lead { font-size: 22px; font-weight: 700; color: #2a6f97; margin-bottom: 10px; }
-    .tag { color: var(--muted); margin-top: 14px !important; }
-    .apps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+
+    /* The hero: today's picture, the same one the Morning Notes app shows */
+    .hero { position: relative; min-height: 64svh; background: #3a4740 center / cover no-repeat; color: #fff;
+            display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
+    .hero .pic { position: absolute; inset: 0; background: center / cover no-repeat; opacity: 0; transition: opacity .8s ease; }
+    .hero .pic.on { opacity: 1; }
+    .hero::after { content: ""; position: absolute; inset: 0; background: var(--scrim); pointer-events: none; }
+    .hero .inner { position: relative; z-index: 1; width: 100%; max-width: 1040px; margin: 0 auto; padding: 48px 20px 96px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 700; letter-spacing: .04em; opacity: .95; margin: 0 0 14px; }
+    .brand svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .hero h1 { font-size: 28px; line-height: 1.25; margin: 0 0 14px; text-shadow: 0 1px 12px rgba(0,0,0,.35); }
+    .hero p { max-width: 640px; margin: 0 0 6px; text-shadow: 0 1px 10px rgba(0,0,0,.45); }
+    .hero .tag { margin-top: 14px; font-size: 16px; opacity: .92; }
+    .credit { position: absolute; z-index: 1; right: 16px; top: 12px; left: 16px; text-align: right; font-size: 14px; color: rgba(255,255,255,.82); margin: 0; text-shadow: 0 1px 6px rgba(0,0,0,.5); }
+
+    /* The apps: cards that rise over the picture */
+    .wrap { position: relative; z-index: 2; max-width: 1040px; margin: -64px auto 0; padding: 0 16px 40px; }
+    .apps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
     @media (max-width: 900px) { .apps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    @media (max-width: 600px) { .apps { grid-template-columns: 1fr; } }
-    a.app { display: flex; gap: 16px; align-items: flex-start; text-decoration: none; color: inherit; min-height: 44px;
-            background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 18px 20px;
-            box-shadow: 0 1px 3px rgba(60, 50, 20, 0.06); transition: border-color .15s, box-shadow .15s; }
-    a.app:hover, a.app:focus-visible { border-color: var(--c); box-shadow: 0 4px 14px rgba(60, 50, 20, 0.10); outline: none; }
-    .icon { width: 52px; height: 52px; flex: none; border-radius: 14px; background: var(--c); color: #fff; display: flex; align-items: center; justify-content: center; }
+    @media (max-width: 600px) { .apps { grid-template-columns: 1fr; } .hero { min-height: 70svh; } }
+    a.app { position: relative; display: flex; gap: 16px; align-items: flex-start; text-decoration: none; color: inherit; min-height: 44px;
+            background: var(--card); border: 1px solid rgba(230, 220, 195, 0.9); border-radius: 18px; padding: 22px 20px 20px; overflow: hidden;
+            box-shadow: 0 2px 6px rgba(40, 32, 10, 0.06), 0 10px 28px rgba(40, 32, 10, 0.08); transition: transform .18s ease, box-shadow .18s ease; }
+    a.app::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: var(--c); opacity: .85; }
+    a.app::after { content: ""; position: absolute; inset: 0; background: radial-gradient(120% 80% at 0% 0%, color-mix(in srgb, var(--c) 9%, transparent), transparent 60%); pointer-events: none; }
+    a.app:hover, a.app:focus-visible { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(40, 32, 10, 0.08), 0 18px 40px rgba(40, 32, 10, 0.14); outline: none; }
+    a.app:focus-visible { box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 45%, transparent), 0 18px 40px rgba(40, 32, 10, 0.14); }
+    .icon { position: relative; z-index: 1; width: 52px; height: 52px; flex: none; border-radius: 14px; color: #fff; display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(145deg, color-mix(in srgb, var(--c) 80%, #fff), var(--c)); box-shadow: 0 4px 12px color-mix(in srgb, var(--c) 35%, transparent); }
     .icon svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .app > span:last-child { position: relative; z-index: 1; }
     .app h2 { margin: 0; font-size: 22px; line-height: 1.3; color: var(--c); }
     .app p { margin: 4px 0 0; color: var(--muted); font-size: 16px; line-height: 1.5; }
-    footer { color: var(--muted); font-size: 14px; margin-top: 40px; }
+    .invite { display: flex; gap: 16px; align-items: center; max-width: 680px; margin: 32px auto 0; padding: 18px 20px; border-radius: 18px;
+              background: rgba(255, 250, 235, 0.9); border: 1px dashed #d8c58f; }
+    .invite h2 { margin: 0; font-size: 18px; color: #6f5714; }
+    .invite p { margin: 2px 0 0; color: var(--muted); font-size: 16px; line-height: 1.5; }
+    footer { color: var(--muted); font-size: 14px; margin-top: 36px; text-align: center; }
+    @media (prefers-reduced-motion: reduce) { .hero .pic, a.app { transition: none; } a.app:hover { transform: none; } }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Curious Stoic</h1>
-    <div class="intro">
-      <p class="lead">I learn by building.</p>
+  <header class="hero" id="hero">
+    <div class="pic" id="pic"></div>
+    <div class="inner">
+      <p class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v8"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m8 6 4-4 4 4"/><path d="M16 18a4 4 0 0 0-8 0"/></svg>Welcome to Curious Stoic</p>
+      <h1>I learn by building.</h1>
       <p>My dyslexic mind learns best by making something I can see.</p>
       <p>I learn across fields, build it beautifully, and share it for the common good.</p>
       <p class="tag">Small apps, coded with Claude, for family and friends.</p>
     </div>
+    <p class="credit" id="credit"></p>
+  </header>
 
+  <main class="wrap">
     <div class="apps">
       <!-- Icons: Lucide (ISC licence), drawn inline -->
       <a class="app" href="/notes/" target="_blank" rel="noopener" style="--c:#2a6f97">
@@ -79,7 +106,38 @@
       </a>
     </div>
 
+    <div class="invite">
+      <span class="icon" style="--c:#8a6d1f"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg></span>
+      <span><h2>By invitation</h2><p>Each app opens with a key from me. They are not open to the public for now.</p></span>
+    </div>
+
     <footer>curiousstoic.com</footer>
-  </div>
+  </main>
+
+  <script>
+    // Today's picture: the newest one in the Morning Notes list (Bing's picture of the day). It fades in once loaded,
+    // so the page never jumps; without it the hero stays a calm dark green. The last picture is kept for an instant start.
+    (function () {
+      var pic = document.getElementById("pic"), credit = document.getElementById("credit");
+      function show(p) {
+        if (!p || !p.url) return;
+        var img = new Image();
+        img.onload = function () {
+          pic.style.backgroundImage = 'url("' + p.url + '")'; pic.classList.add("on");
+          var m = /\(([^()]*©[^()]*)\)\s*$/.exec(p.credit || ""), place = (p.credit || "").replace(/\s*\([^()]*©[^()]*\)\s*$/, "");
+          credit.textContent = place ? "Today's picture: " + place + (m ? ", " + m[1] : "") : "";
+        };
+        img.src = p.url;
+      }
+      try { show(JSON.parse(localStorage.getItem("cs.pic") || "null")); } catch (e) {}
+      fetch("/notes/data/wallpapers.json", { cache: "no-cache" }).then(function (r) { return r.json(); }).then(function (all) {
+        var days = Object.keys(all).sort(), p = all[days[days.length - 1]];
+        if (!p) return;
+        var was = null; try { was = JSON.parse(localStorage.getItem("cs.pic") || "null"); } catch (e) {}
+        try { localStorage.setItem("cs.pic", JSON.stringify(p)); } catch (e) {}
+        if (!was || was.url !== p.url) show(p);
+      }).catch(function () {});
+    })();
+  </script>
 </body>
 </html>
