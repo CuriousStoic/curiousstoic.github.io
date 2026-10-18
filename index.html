@@ -51,29 +51,25 @@
     .apps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
     @media (max-width: 900px) { .apps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @media (max-width: 600px) { .apps { grid-template-columns: 1fr; } }
-    a.app { position: relative; display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: inherit;
-            background: var(--card); border: 1px solid rgba(230, 220, 195, 0.9); border-radius: 18px; padding: 22px 20px 20px; overflow: hidden;
-            box-shadow: 0 2px 6px rgba(40, 32, 10, 0.05), 0 10px 26px rgba(40, 32, 10, 0.07); transition: transform .18s ease, box-shadow .18s ease; }
-    a.app::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: var(--c); opacity: .85; }
-    a.app { background: linear-gradient(160deg, color-mix(in srgb, var(--c) 13%, #fffdf7) 0%, color-mix(in srgb, var(--c) 5%, #fffdf7) 55%, #fffdf7 100%); }
-    a.app::after { content: ""; position: absolute; inset: 0; background: radial-gradient(90% 60% at 100% 100%, color-mix(in srgb, var(--c) 10%, transparent), transparent 70%); pointer-events: none; }
-    .wm { position: absolute; right: -18px; bottom: -22px; width: 150px; height: 150px; color: var(--c); opacity: .09; pointer-events: none; transform: rotate(-8deg); }
-    .wm svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
-    a.app:hover, a.app:focus-visible { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(40, 32, 10, 0.08), 0 18px 40px rgba(40, 32, 10, 0.13); outline: none; }
-    a.app:focus-visible { box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 45%, transparent); }
+    /* Each card is filled with its app's own colour, like a tile in an app store (her ask, 2026-10-18) */
+    a.app { position: relative; display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: #fff; border: 0; border-radius: 22px; padding: 24px 22px 22px; overflow: hidden;
+            background: linear-gradient(150deg, color-mix(in srgb, var(--c) 70%, #fff) 0%, var(--c) 55%, color-mix(in srgb, var(--c) 78%, #000) 100%);
+            box-shadow: 0 6px 16px color-mix(in srgb, var(--c) 28%, transparent), 0 18px 40px rgba(40, 32, 10, 0.10); transition: transform .18s ease, box-shadow .18s ease; }
+    a.app::after { content: ""; position: absolute; inset: 0; background: radial-gradient(80% 60% at 0% 0%, rgba(255,255,255,.22), transparent 60%); pointer-events: none; }
+    a.app:hover, a.app:focus-visible { transform: translateY(-4px); box-shadow: 0 10px 22px color-mix(in srgb, var(--c) 36%, transparent), 0 24px 50px rgba(40, 32, 10, 0.16); outline: none; }
+    a.app:focus-visible { box-shadow: 0 0 0 4px #fff, 0 0 0 7px var(--c); }
     .app .head { position: relative; z-index: 1; display: flex; gap: 14px; align-items: center; }
-    .icon { width: 52px; height: 52px; flex: none; border-radius: 14px; color: #fff; display: flex; align-items: center; justify-content: center;
-            background: linear-gradient(145deg, color-mix(in srgb, var(--c) 80%, #fff), var(--c)); box-shadow: 0 4px 12px color-mix(in srgb, var(--c) 35%, transparent); }
+    .icon { width: 52px; height: 52px; flex: none; border-radius: 16px; color: #fff; display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.3); }
     .icon svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    .app h2 { margin: 0; font-size: 22px; line-height: 1.3; color: var(--c); }
-    .app .count { margin: 0; font-size: 14px; color: var(--muted); }
-    .app p.d { position: relative; z-index: 1; margin: 0; color: var(--text); font-size: 16px; line-height: 1.6; }
+    .app h2 { margin: 0; font-size: 22px; line-height: 1.3; color: #fff; }
+    .app .count { margin: 0; font-size: 14px; color: rgba(255,255,255,.85); }
+    .app p.d { position: relative; z-index: 1; margin: 0; color: rgba(255,255,255,.96); font-size: 16px; line-height: 1.6; }
     .chips { position: relative; z-index: 1; list-style: none; margin: auto 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-    .chips li { font-size: 14px; line-height: 1.3; padding: 6px 12px; border-radius: 999px; color: color-mix(in srgb, var(--c) 85%, #000); background: color-mix(in srgb, var(--c) 10%, #fff); border: 1px solid color-mix(in srgb, var(--c) 18%, #fff); }
-
+    .chips li { font-size: 14px; line-height: 1.3; padding: 6px 12px; border-radius: 999px; color: #fff; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.3); }
     .invite { display: flex; gap: 16px; align-items: center; max-width: 680px; margin: 36px auto 0; padding: 18px 20px; border-radius: 18px;
               background: rgba(255, 250, 235, 0.9); border: 1px dashed #d8c58f; }
-    .invite .icon { width: 44px; height: 44px; }
+    .invite .icon { width: 44px; height: 44px; background: var(--c); border: 0; }
     .invite .icon svg { width: 24px; height: 24px; }
     .invite h2 { margin: 0; font-size: 18px; color: #6f5714; }
     .invite p { margin: 2px 0 0; color: var(--muted); font-size: 16px; line-height: 1.5; }
@@ -160,7 +156,7 @@
       <span><h2>By invitation</h2><p>Each app opens with a key from me. They are not open to the public for now.</p></span>
     </div>
 
-    <footer>curiousstoic.com · Version <span id="ver">2031</span></footer>
+    <footer>curiousstoic.com · Version <span id="ver">1413</span></footer>
   </main>
 
   <script>
@@ -200,12 +196,6 @@
         });
       }).catch(function () {});
 
-      // Each card carries a large, faint copy of its icon in the corner, like a watermark
-      document.querySelectorAll("a.app").forEach(function (a) {
-        var svg = a.querySelector(".icon svg"); if (!svg) return;
-        var wm = document.createElement("span"); wm.className = "wm"; wm.setAttribute("aria-hidden", "true");
-        wm.appendChild(svg.cloneNode(true)); a.insertBefore(wm, a.firstChild);
-      });
       // How many mornings the family has had notes: every day since April 21, 2026, today included
       var m = document.getElementById("mornings");
       if (m) { var n = Math.floor((Date.now() - new Date(2026, 3, 21).getTime()) / 86400000) + 1; if (n > 0) m.textContent = n + " mornings since April 2026"; }
