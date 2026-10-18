@@ -9,54 +9,79 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    :root { --bg: #f6f1e4; --card: rgba(255, 253, 247, 0.96); --text: #2b2b2b; --muted: #5f5f5f; --border: #e6dcc3;
-            --scrim: linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.02) 30%, rgba(0,0,0,0.30) 60%, rgba(0,0,0,0.66) 100%); }
+    :root { --bg: #f6f1e4; --card: #fffdf7; --text: #2b2b2b; --muted: #5f5f5f; --border: #e6dcc3;
+            --scrim: linear-gradient(180deg, rgba(0,0,0,0.20) 0%, rgba(0,0,0,0.02) 28%, rgba(0,0,0,0.28) 58%, rgba(0,0,0,0.68) 100%); }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--bg); color: var(--text); font-family: "Nunito Sans", Arial, sans-serif; font-size: 18px; line-height: 1.7; letter-spacing: 0.01em; }
+    button { font: inherit; }
 
     /* The hero: today's picture, the same one the Morning Notes app shows */
-    .hero { position: relative; min-height: 64svh; background: #3a4740 center / cover no-repeat; color: #fff;
-            display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
+    .hero { position: relative; min-height: 74svh; background: #3a4740; color: #fff; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; transition: min-height .45s ease; }
     .hero .pic { position: absolute; inset: 0; background: center / cover no-repeat; opacity: 0; transition: opacity .8s ease; }
     .hero .pic.on { opacity: 1; }
-    .hero::after { content: ""; position: absolute; inset: 0; background: var(--scrim); pointer-events: none; }
-    .hero .inner { position: relative; z-index: 1; width: 100%; max-width: 1040px; margin: 0 auto; padding: 48px 20px 96px; }
-    .brand { display: inline-flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 700; letter-spacing: .04em; opacity: .95; margin: 0 0 14px; }
-    .brand svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .hero::after { content: ""; position: absolute; inset: 0; background: var(--scrim); pointer-events: none; transition: opacity .45s ease; }
+    .hero .inner { position: relative; z-index: 1; width: 100%; max-width: 1040px; margin: 0 auto; padding: 48px 20px 64px; transition: opacity .35s ease; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 700; letter-spacing: .04em; margin: 0 0 14px; }
+    .brand svg, .pill svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .hero h1 { font-size: 28px; line-height: 1.25; margin: 0 0 14px; text-shadow: 0 1px 12px rgba(0,0,0,.35); }
-    .hero p { max-width: 640px; margin: 0 0 6px; text-shadow: 0 1px 10px rgba(0,0,0,.45); }
-    .hero .tag { margin-top: 14px; font-size: 16px; opacity: .92; }
-    .credit { position: absolute; z-index: 1; right: 16px; top: 12px; left: 16px; text-align: right; font-size: 14px; color: rgba(255,255,255,.82); margin: 0; text-shadow: 0 1px 6px rgba(0,0,0,.5); }
+    .hero .inner p { max-width: 640px; margin: 0 0 6px; text-shadow: 0 1px 10px rgba(0,0,0,.45); }
+    .hero .inner .tag { margin-top: 14px; font-size: 16px; opacity: .92; }
+    .credit { position: absolute; z-index: 1; left: 20px; right: 16px; bottom: 10px; margin: 0; text-align: right; font-size: 14px; line-height: 1.35; color: rgba(255,255,255,.8); text-shadow: 0 1px 6px rgba(0,0,0,.5); }
+    .pill { position: absolute; z-index: 3; top: calc(14px + env(safe-area-inset-top)); right: 16px; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 18px;
+            border-radius: 999px; border: 1px solid rgba(255,255,255,.45); background: rgba(20, 24, 22, .32); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer;
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+    .pill:hover, .pill:focus-visible { background: rgba(20, 24, 22, .5); outline: none; }
 
-    /* The apps: cards that rise over the picture */
-    .wrap { position: relative; z-index: 2; max-width: 1040px; margin: -64px auto 0; padding: 0 16px 40px; }
+    /* Just the picture: everything else steps aside; a small card says what the picture is */
+    .about-pic { position: absolute; z-index: 2; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); max-width: 440px; margin-right: 16px; padding: 16px 20px; border-radius: 18px;
+                 background: rgba(255, 253, 247, .94); color: var(--text); box-shadow: 0 10px 30px rgba(0,0,0,.25); opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity .4s ease, transform .4s ease; }
+    .about-pic .k { margin: 0; font-size: 14px; font-weight: 700; color: #2a6f97; letter-spacing: .02em; }
+    .about-pic h2 { margin: 2px 0 2px; font-size: 22px; line-height: 1.3; }
+    .about-pic .place { margin: 0 0 8px; font-size: 16px; color: var(--muted); }
+    .about-pic .text { margin: 0; font-size: 16px; line-height: 1.6; }
+    .about-pic .by { margin: 8px 0 0; font-size: 14px; color: var(--muted); }
+    body.pure .hero { position: fixed; inset: 0; min-height: 0; z-index: 5; }
+    body.pure .hero::after { opacity: .35; }
+    body.pure .hero .inner, body.pure .credit { opacity: 0; pointer-events: none; }
+    body.pure main { display: none; }
+    body.pure .about-pic { opacity: 1; transform: none; pointer-events: auto; }
+
+    /* The apps, on the cream ground under the picture */
+    main { max-width: 1040px; margin: 0 auto; padding: 36px 16px 40px; }
     .apps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
     @media (max-width: 900px) { .apps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    @media (max-width: 600px) { .apps { grid-template-columns: 1fr; } .hero { min-height: 70svh; } }
-    a.app { position: relative; display: flex; gap: 16px; align-items: flex-start; text-decoration: none; color: inherit; min-height: 44px;
+    @media (max-width: 600px) { .apps { grid-template-columns: 1fr; } }
+    a.app { position: relative; display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: inherit;
             background: var(--card); border: 1px solid rgba(230, 220, 195, 0.9); border-radius: 18px; padding: 22px 20px 20px; overflow: hidden;
-            box-shadow: 0 2px 6px rgba(40, 32, 10, 0.06), 0 10px 28px rgba(40, 32, 10, 0.08); transition: transform .18s ease, box-shadow .18s ease; }
+            box-shadow: 0 2px 6px rgba(40, 32, 10, 0.05), 0 10px 26px rgba(40, 32, 10, 0.07); transition: transform .18s ease, box-shadow .18s ease; }
     a.app::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: var(--c); opacity: .85; }
-    a.app::after { content: ""; position: absolute; inset: 0; background: radial-gradient(120% 80% at 0% 0%, color-mix(in srgb, var(--c) 9%, transparent), transparent 60%); pointer-events: none; }
-    a.app:hover, a.app:focus-visible { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(40, 32, 10, 0.08), 0 18px 40px rgba(40, 32, 10, 0.14); outline: none; }
-    a.app:focus-visible { box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 45%, transparent), 0 18px 40px rgba(40, 32, 10, 0.14); }
-    .icon { position: relative; z-index: 1; width: 52px; height: 52px; flex: none; border-radius: 14px; color: #fff; display: flex; align-items: center; justify-content: center;
+    a.app::after { content: ""; position: absolute; inset: 0; background: radial-gradient(120% 70% at 0% 0%, color-mix(in srgb, var(--c) 9%, transparent), transparent 60%); pointer-events: none; }
+    a.app:hover, a.app:focus-visible { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(40, 32, 10, 0.08), 0 18px 40px rgba(40, 32, 10, 0.13); outline: none; }
+    a.app:focus-visible { box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 45%, transparent); }
+    .app .head { position: relative; z-index: 1; display: flex; gap: 14px; align-items: center; }
+    .icon { width: 52px; height: 52px; flex: none; border-radius: 14px; color: #fff; display: flex; align-items: center; justify-content: center;
             background: linear-gradient(145deg, color-mix(in srgb, var(--c) 80%, #fff), var(--c)); box-shadow: 0 4px 12px color-mix(in srgb, var(--c) 35%, transparent); }
     .icon svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    .app > span:last-child { position: relative; z-index: 1; }
     .app h2 { margin: 0; font-size: 22px; line-height: 1.3; color: var(--c); }
-    .app p { margin: 4px 0 0; color: var(--muted); font-size: 16px; line-height: 1.5; }
-    .invite { display: flex; gap: 16px; align-items: center; max-width: 680px; margin: 32px auto 0; padding: 18px 20px; border-radius: 18px;
+    .app .count { margin: 0; font-size: 14px; color: var(--muted); }
+    .app p.d { position: relative; z-index: 1; margin: 0; color: var(--text); font-size: 16px; line-height: 1.6; }
+    .chips { position: relative; z-index: 1; list-style: none; margin: auto 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+    .chips li { font-size: 14px; line-height: 1.3; padding: 6px 12px; border-radius: 999px; color: color-mix(in srgb, var(--c) 85%, #000); background: color-mix(in srgb, var(--c) 10%, #fff); border: 1px solid color-mix(in srgb, var(--c) 18%, #fff); }
+
+    .invite { display: flex; gap: 16px; align-items: center; max-width: 680px; margin: 36px auto 0; padding: 18px 20px; border-radius: 18px;
               background: rgba(255, 250, 235, 0.9); border: 1px dashed #d8c58f; }
+    .invite .icon { width: 44px; height: 44px; }
+    .invite .icon svg { width: 24px; height: 24px; }
     .invite h2 { margin: 0; font-size: 18px; color: #6f5714; }
     .invite p { margin: 2px 0 0; color: var(--muted); font-size: 16px; line-height: 1.5; }
     footer { color: var(--muted); font-size: 14px; margin-top: 36px; text-align: center; }
-    @media (prefers-reduced-motion: reduce) { .hero .pic, a.app { transition: none; } a.app:hover { transform: none; } }
+    @media (prefers-reduced-motion: reduce) { .hero, .hero .pic, .hero .inner, .about-pic, a.app { transition: none; } a.app:hover { transform: none; } }
   </style>
 </head>
 <body>
   <header class="hero" id="hero">
     <div class="pic" id="pic"></div>
+    <button class="pill" id="pure" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg><span>Just the picture</span></button>
     <div class="inner">
       <p class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v8"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m8 6 4-4 4 4"/><path d="M16 18a4 4 0 0 0-8 0"/></svg>Welcome to Curious Stoic</p>
       <h1>I learn by building.</h1>
@@ -65,44 +90,65 @@
       <p class="tag">Small apps, coded with Claude, for family and friends.</p>
     </div>
     <p class="credit" id="credit"></p>
+    <aside class="about-pic" id="about-pic" aria-live="polite">
+      <p class="k">Today's picture</p>
+      <h2 id="pic-title">A picture from somewhere beautiful</h2>
+      <p class="place" id="pic-place"></p>
+      <p class="text" id="pic-text"></p>
+      <p class="by" id="pic-by"></p>
+    </aside>
   </header>
 
-  <main class="wrap">
+  <main>
     <div class="apps">
       <!-- Icons: Lucide (ISC licence), drawn inline -->
       <a class="app" href="/notes/" target="_blank" rel="noopener" style="--c:#2a6f97">
-        <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v8"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m8 6 4-4 4 4"/><path d="M16 18a4 4 0 0 0-8 0"/></svg></span>
-        <span><h2>Daily Morning Notes</h2><p>Our family's morning ritual. A note to each of my children for where they are in life, and a Stoic thought we all reflect on. One day at a time.</p></span>
+        <span class="head"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v8"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m8 6 4-4 4 4"/><path d="M16 18a4 4 0 0 0-8 0"/></svg></span>
+          <span><h2>Daily Morning Notes</h2><p class="count">Every morning since April 2026</p></span></span>
+        <p class="d">Our family's morning ritual and digital diary. A daily note to each of my children for where they are in life, and a Stoic thought we all reflect on.</p>
+        <ul class="chips"><li>A note to my daughter</li><li>A note to my son</li><li>The Daily Stoic</li><li>Family reflections</li></ul>
       </a>
 
       <a class="app" href="/music/" target="_blank" rel="noopener" style="--c:#4f7a5c">
-        <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
-        <span><h2>Spardha Music</h2><p>A companion for the music class on Spardha Online.</p></span>
+        <span class="head"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
+          <span><h2>Spardha Music</h2><p class="count">7 chapters</p></span></span>
+        <p class="d">My Hindustani vocal music class on the Spardha Online platform. Each chapter has its recordings, scales, tips and homework.</p>
+        <ul class="chips"><li>Meend</li><li>Raag Bhairav</li><li>Raag Bhoop</li><li>Raag Yaman</li></ul>
       </a>
 
       <a class="app" href="/dyslexia/" target="_blank" rel="noopener" style="--c:#1d5c63">
-        <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span>
-        <span><h2>Dyslexia</h2><p>What dyslexia is, how the dyslexic brain works, and how to support it.</p></span>
+        <span class="head"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span>
+          <span><h2>Dyslexia</h2><p class="count">24 topics</p></span></span>
+        <p class="d">How the dyslexic mind works, what it is like to live and work with it, and the strengths it brings. Written by a dyslexic, for anyone curious.</p>
+        <ul class="chips"><li>The dyslexic brain</li><li>Living with dyslexia</li><li>At work</li><li>Your strengths</li></ul>
       </a>
 
       <a class="app" href="/gyaan/" target="_blank" rel="noopener" style="--c:#4b2d6e">
-        <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg></span>
-        <span><h2>Gyaan</h2><p>Lessons gathered over the years, laid out so you can find your way around them.</p></span>
+        <span class="head"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg></span>
+          <span><h2>Gyaan</h2><p class="count">58 lessons</p></span></span>
+        <p class="d">The lessons I have gathered over the years, from great thinkers, books and old fables. Laid out so you can find your way around them.</p>
+        <ul class="chips"><li>Thinking clearly</li><li>Time and habits</li><li>Leading people</li><li>Books and fables</li></ul>
       </a>
 
       <a class="app" href="/womens-health/" target="_blank" rel="noopener" style="--c:#5a2d5c">
-        <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></svg></span>
-        <span><h2>Women's Health</h2><p>Learning about women's health, led by science.</p></span>
+        <span class="head"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></svg></span>
+          <span><h2>Women's Health</h2><p class="count">48 topics, coming soon</p></span></span>
+        <p class="d">A science-led guide to how a woman's body works, for thriving health and a long life. Each system explained in plain words.</p>
+        <ul class="chips"><li>Hormones and menopause</li><li>Sleep</li><li>Strong muscles and bones</li><li>Longevity</li></ul>
       </a>
 
       <a class="app" href="/ai-learning/" target="_blank" rel="noopener" style="--c:#35587a">
-        <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg></span>
-        <span><h2>AI Learning</h2><p>A map of AI: what each area is, how it connects, and what to learn next.</p></span>
+        <span class="head"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg></span>
+          <span><h2>AI Learning</h2><p class="count">98 topics in 13 areas</p></span></span>
+        <p class="d">My map of AI. What each area is, how the areas connect, and what to learn next, with the best thinking from people who build it.</p>
+        <ul class="chips"><li>How models work</li><li>Safety and alignment</li><li>Agents</li><li>Responsible AI</li></ul>
       </a>
 
       <a class="app" href="/copilot-skills/" target="_blank" rel="noopener" style="--c:#1d5c73">
-        <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></span>
-        <span><h2>Copilot Skills</h2><p>Learning the new Microsoft 365 Copilot, one skill at a time.</p></span>
+        <span class="head"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></span>
+          <span><h2>Copilot Skills</h2><p class="count">24 topics</p></span></span>
+        <p class="d">Hands-on practice with the new Microsoft 365 Copilot. Each topic has clear steps and prompts you can copy and try.</p>
+        <ul class="chips"><li>Good prompts</li><li>Build an app</li><li>Autopilot</li><li>Agents</li></ul>
       </a>
     </div>
 
@@ -111,32 +157,57 @@
       <span><h2>By invitation</h2><p>Each app opens with a key from me. They are not open to the public for now.</p></span>
     </div>
 
-    <footer>curiousstoic.com</footer>
+    <footer>curiousstoic.com · Version <span id="ver">2024</span></footer>
   </main>
 
   <script>
-    // Today's picture: the newest one in the Morning Notes list (Bing's picture of the day). It fades in once loaded,
-    // so the page never jumps; without it the hero stays a calm dark green. The last picture is kept for an instant start.
+    // Today's picture: the newest one in the Morning Notes list (Bing's picture of the day), with the short write-up
+    // the morning routine makes about it. The picture fades in once loaded, so the page never jumps.
     (function () {
       var pic = document.getElementById("pic"), credit = document.getElementById("credit");
+      function by(p) { var m = /\(([^()]*©[^()]*)\)\s*$/.exec(p.credit || ""); return m ? m[1] : ""; }
+      function placeOf(p) { return (p.credit || "").replace(/\s*\([^()]*©[^()]*\)\s*$/, ""); }
       function show(p) {
         if (!p || !p.url) return;
         var img = new Image();
         img.onload = function () {
           pic.style.backgroundImage = 'url("' + p.url + '")'; pic.classList.add("on");
-          var m = /\(([^()]*©[^()]*)\)\s*$/.exec(p.credit || ""), place = (p.credit || "").replace(/\s*\([^()]*©[^()]*\)\s*$/, "");
-          credit.textContent = place ? "Today's picture: " + place + (m ? ", " + m[1] : "") : "";
+          var place = placeOf(p);
+          credit.textContent = place ? "Picture: " + place + (by(p) ? ", " + by(p) : "") : "";
         };
         img.src = p.url;
       }
-      try { show(JSON.parse(localStorage.getItem("cs.pic") || "null")); } catch (e) {}
+      function describe(p, w) {
+        document.getElementById("pic-title").textContent = (w && w.title) || p.title || "Today's picture";
+        document.getElementById("pic-place").textContent = (w && w.place) || placeOf(p);
+        document.getElementById("pic-text").textContent = (w && w.text) || "";
+        document.getElementById("pic-by").textContent = by(p) ? "Picture " + by(p) : "";
+      }
+      var cached = null; try { cached = JSON.parse(localStorage.getItem("cs.pic") || "null"); } catch (e) {}
+      if (cached) { show(cached); describe(cached, cached.about); }
       fetch("/notes/data/wallpapers.json", { cache: "no-cache" }).then(function (r) { return r.json(); }).then(function (all) {
-        var days = Object.keys(all).sort(), p = all[days[days.length - 1]];
+        var days = Object.keys(all).sort(), day = days[days.length - 1], p = all[day];
         if (!p) return;
-        var was = null; try { was = JSON.parse(localStorage.getItem("cs.pic") || "null"); } catch (e) {}
-        try { localStorage.setItem("cs.pic", JSON.stringify(p)); } catch (e) {}
-        if (!was || was.url !== p.url) show(p);
+        if (!cached || cached.url !== p.url) show(p);
+        describe(p, null);
+        return fetch("/notes/data/pictures.json", { cache: "no-cache" }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }).then(function (w) {
+          var about = w && w[day]; describe(p, about);
+          p.about = about || null;
+          try { localStorage.setItem("cs.pic", JSON.stringify(p)); } catch (e) {}
+        });
       }).catch(function () {});
+
+      // Just the picture, and back again
+      var btn = document.getElementById("pure"), label = btn.querySelector("span");
+      function setPure(on) {
+        document.body.classList.toggle("pure", on);
+        btn.setAttribute("aria-pressed", on ? "true" : "false");
+        label.textContent = on ? "Back to the apps" : "Just the picture";
+        if (on) window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      btn.addEventListener("click", function () { setPure(!document.body.classList.contains("pure")); });
+      if (location.hash === "#picture") setPure(true);   // a link straight to just the picture
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape" && document.body.classList.contains("pure")) setPure(false); });
     })();
   </script>
 </body>
