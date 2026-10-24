@@ -190,7 +190,7 @@
       <span><h2>By invitation</h2><p>Each app opens with a key from me. They are not open to the public for now.</p></span>
     </div>
 
-    <footer>curiousstoic.com · Version <span id="ver">0741</span></footer>
+    <footer>curiousstoic.com · Version <span id="ver">0641</span></footer>
   </main>
 
   <script>
@@ -246,6 +246,8 @@
       if (location.hash === "#picture") setPure(true);   // a link straight to just the picture
       document.addEventListener("keydown", function (e) { if (e.key === "Escape" && document.body.classList.contains("pure")) setPure(false); });
     })();
+      // The 10 domains start closed on every visit, even when the browser brings the page back from memory (her rule, October 24, 2026)
+      window.addEventListener("pageshow", () => document.querySelectorAll("details.dom[open]").forEach((d) => { d.open = false; }));
   </script>
 </body>
 </html>
