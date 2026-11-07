@@ -76,8 +76,8 @@
     .about-pic .tip { display: none; margin: 8px 0 0; font-size: 16px; font-weight: 700; color: #2a6f97; }
     .about-pic .tip .all, body.whole .about-pic .tip .fill { display: none; }
     body.whole .about-pic .tip .all { display: inline; }
-    /* A phone held upright: the picture fills the screen ("going for feeling"); a double-tap shows all of it on a soft
-       blurred copy of itself, another fills the screen again (her pick, 2026-11-02, the same as Daily Morning Notes) */
+    /* A phone held upright: all of the picture at first, on a soft blurred copy of itself; a double-tap fills the screen,
+       another shows all of it again (her pick, November 7, 2026; it used to start filled, like Daily Morning Notes) */
     @media (max-aspect-ratio: 1/1) {
       body.pure .about-pic .tip { display: block; }
       body.pure.whole .hero .pic::before { content: ""; position: absolute; inset: 0; background: inherit; background-size: cover; filter: blur(28px) brightness(.6) saturate(1.2); transform: scale(1.25); }
@@ -250,7 +250,7 @@
       <span><h2>By invitation</h2><p>Each app opens with a key from me. They are not open to the public for now.</p></span>
     </div>
 
-    <footer>curiousstoic.com · Version <span id="ver">0642</span></footer>
+    <footer>curiousstoic.com · Version <span id="ver">0643</span></footer>
   </main>
 
   <script>
@@ -298,7 +298,8 @@
       var btn = document.getElementById("pure"), label = btn.querySelector("span");
       function setPure(on) {
         document.body.classList.toggle("pure", on);
-        document.body.classList.remove("whole");             // the picture fills the screen at first, every time
+        // A phone held upright shows all of the picture at first, every time; a double-tap fills the screen (her pick, November 7, 2026)
+        document.body.classList.toggle("whole", on && matchMedia("(max-aspect-ratio: 1/1)").matches);
         document.getElementById("pic-card").open = false;    // and the card starts folded
         btn.setAttribute("aria-pressed", on ? "true" : "false");
         label.textContent = on ? "Back to the apps" : "Just the picture";
