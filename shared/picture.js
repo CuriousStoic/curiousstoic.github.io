@@ -10,7 +10,7 @@
 
   const css = document.createElement("link");
   css.rel = "stylesheet";
-  css.href = "/shared/picture.css?v=5";
+  css.href = "/shared/picture.css?v=6";
   document.head.appendChild(css);
 
   function todayIso() {
@@ -88,8 +88,150 @@
     const b = ev.target.closest && ev.target.closest("[data-cs-picture]");
     if (b) { ev.preventDefault(); open(); }
   });
-  document.addEventListener("keydown", (ev) => { if (ev.key === "Escape") close(); });
-  window.CuriousPicture = { open, close, ready: () => load().then((t) => !!(t && t.pic && t.pic.url)) };
+  document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && ev.isTrusted) close(); });
+
+  // ---------- Breathe: slow breathing on today's picture (her ask, 2026-11-08) ----------
+  // In for 4 seconds through the nose, out for 8 slowly "as if through a straw": the breath out twice as long as the breath in
+  // (pursed-lip breathing; Huberman: breaths out slow the heart). 5 breaths a minute. She picks 1, 3 or 5 minutes.
+  // Sound is off at first (like Instagram); the speaker turns on a soft made "om" tone on each breath out, and a chime at the end.
+  // Any element with data-cs-breathe opens it.
+  const IN_S = 4, OUT_S = 8;
+  let bx = null, timers = [], audio = null, soundOn = false, wake = null, run = null;
+  const SPK_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4.7a.7.7 0 0 0-1.2-.5L6.4 7.6A1.4 1.4 0 0 1 5.4 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.4a1.4 1.4 0 0 1 1 .4l3.4 3.4a.7.7 0 0 0 1.2-.5z"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg>';
+  const SPK_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4.7a.7.7 0 0 0-1.2-.5L6.4 7.6A1.4 1.4 0 0 1 5.4 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.4a1.4 1.4 0 0 1 1 .4l3.4 3.4a.7.7 0 0 0 1.2-.5z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.4 18.4a9 9 0 0 0 0-12.8"/></svg>';
+  function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+  function stopTimers() { timers.forEach(clearTimeout); timers = []; }
+  function ctx() {
+    if (audio) return audio;
+    try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) {}   // iPhone: play even on silent
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    const c = new AC(), master = c.createGain();
+    master.gain.value = 0.9; master.connect(c.destination);
+    audio = { c, master };
+    return audio;
+  }
+  function om(seconds) {               // a soft, low hum with gentle overtones, rising and fading with the breath out
+    const a = soundOn && ctx(); if (!a) return;
+    const { c, master } = a, t = c.currentTime;
+    const g = c.createGain(), f = c.createBiquadFilter();
+    f.type = "lowpass"; f.frequency.value = 700;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.22, t + 1.2);
+    g.gain.setValueAtTime(0.22, t + seconds - 2);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + seconds - 0.1);
+    g.connect(f); f.connect(master);
+    [[136.1, 1], [272.2, 0.3], [408.3, 0.12], [136.6, 0.5]].forEach(([hz, v]) => {
+      const o = c.createOscillator(), og = c.createGain();
+      o.type = "sine"; o.frequency.value = hz; og.gain.value = v;
+      o.connect(og); og.connect(g); o.start(t); o.stop(t + seconds);
+    });
+  }
+  function chime() {
+    const a = soundOn && ctx(); if (!a) return;
+    const { c, master } = a, t = c.currentTime;
+    [[528, 0.18], [792, 0.08]].forEach(([hz, v]) => {
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = "sine"; o.frequency.value = hz;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.05); g.gain.exponentialRampToValueAtTime(0.0001, t + 4);
+      o.connect(g); g.connect(master); o.start(t); o.stop(t + 4.1);
+    });
+  }
+  function setSound(on) {
+    soundOn = on;
+    const b = bx.querySelector(".csb-sound");
+    b.setAttribute("aria-pressed", on ? "true" : "false");
+    b.innerHTML = (on ? SPK_ON : SPK_OFF) + "<span>" + (on ? "Sound on" : "Sound off") + "</span>";
+    if (on) { const a = ctx(); if (a && a.c.state === "suspended") a.c.resume(); }
+  }
+  async function keepAwake(on) {
+    try {
+      if (on && navigator.wakeLock && !wake) wake = await navigator.wakeLock.request("screen");
+      if (!on && wake) { await wake.release(); wake = null; }
+    } catch (e) { wake = null; }
+  }
+  function mmss(s) { return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }
+  function panel(name) { bx.querySelectorAll(".csb-panel").forEach((p) => { p.hidden = p.dataset.panel !== name; }); }
+  function word(text) { bx.querySelector(".csb-word").textContent = text; }
+  function buildBreathe(url) {
+    bx = el("div", "csb");
+    bx.setAttribute("role", "dialog");
+    bx.setAttribute("aria-label", "Breathe");
+    if (url) bx.style.setProperty("--csp-img", "url('" + String(url).replace(/'/g, "%27") + "')");
+    bx.innerHTML =
+      '<div class="csb-top"><button class="csb-close" type="button">Close</button><button class="csb-sound" type="button" aria-pressed="false"></button></div>' +
+      '<div class="csb-mid"><div class="csb-ring"><div class="csb-ball"></div><span class="csb-word" aria-live="polite">Slow breathing</span></div></div>' +
+      '<div class="csb-panel" data-panel="start"><h2>Slow breathing</h2><p>Breathe in through your nose for 4.<br>Breathe out slowly for 8, as if through a straw.</p>' +
+      '<div class="csb-picks"><button type="button" data-min="1">1 minute</button><button type="button" data-min="3">3 minutes</button><button type="button" data-min="5">5 minutes</button></div></div>' +
+      '<div class="csb-panel" data-panel="run" hidden><p class="csb-count"></p><button class="csb-stop" type="button">Stop</button></div>' +
+      '<div class="csb-panel" data-panel="done" hidden><h2>Well done</h2><p class="csb-done"></p><div class="csb-picks"><button type="button" class="csb-again">Again</button><button type="button" class="csb-close2">Close</button></div></div>';
+    bx.querySelector(".csb-close").addEventListener("click", closeBreathe);
+    bx.querySelector(".csb-close2").addEventListener("click", closeBreathe);
+    bx.querySelector(".csb-sound").addEventListener("click", () => setSound(!soundOn));
+    bx.querySelector(".csb-stop").addEventListener("click", () => finish(true));
+    bx.querySelector(".csb-again").addEventListener("click", () => { panel("start"); word("Slow breathing"); });
+    bx.querySelectorAll("[data-min]").forEach((b) => b.addEventListener("click", () => startBreathing(Number(b.dataset.min))));
+    document.body.appendChild(bx);
+  }
+  function startBreathing(min) {
+    if (soundOn) { const a = ctx(); if (a && a.c.state === "suspended") a.c.resume(); }   // this tap counts as the iPhone's "user gesture"
+    const total = (min * 60) / (IN_S + OUT_S);      // 5, 15 or 25 breaths
+    const ball = bx.querySelector(".csb-ball"), count = bx.querySelector(".csb-count");
+    run = { total, done: 0, end: Date.now() + min * 60000 };
+    panel("run"); keepAwake(true);
+    const tick = () => { if (!run) return; count.textContent = "Breath " + Math.min(run.done + 1, run.total) + " of " + run.total + " · " + mmss(Math.max(0, Math.round((run.end - Date.now()) / 1000))) + " left"; later(tick, 1000); };
+    tick();
+    const breath = () => {
+      if (!run) return;
+      if (run.done >= run.total) return finish(false);
+      word("Breathe in");
+      ball.style.transitionDuration = IN_S + "s"; ball.classList.add("full");
+      later(() => {
+        word("Breathe out");
+        ball.style.transitionDuration = OUT_S + "s"; ball.classList.remove("full");
+        om(OUT_S);
+        later(() => { run.done++; breath(); }, OUT_S * 1000);
+      }, IN_S * 1000);
+    };
+    later(breath, 300);
+  }
+  function finish(stopped) {
+    const n = run ? run.done : 0;
+    stopTimers(); run = null; keepAwake(false);
+    bx.querySelector(".csb-ball").classList.remove("full");
+    word(stopped ? "Rest" : "Done");
+    bx.querySelector(".csb-done").textContent = n === 0 ? "Come back any time." : n === 1 ? "1 slow breath." : n + " slow breaths.";
+    panel("done");
+    if (!stopped) chime();
+  }
+  function openBreathe() {
+    return load().then((t) => t, () => null).then((t) => {
+      if (!bx) buildBreathe(t && t.pic && t.pic.url);
+      lastFocus = document.activeElement;
+      setSound(false);                                // off at first, every time
+      panel("start"); word("Slow breathing");
+      bx.hidden = false;
+      document.documentElement.classList.add("csp-open");
+      bx.querySelector(".csb-close").focus();
+      // the phone menu may still be open behind: apps close it on Escape
+      document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    });
+  }
+  function closeBreathe() {
+    if (!bx || bx.hidden) return;
+    stopTimers(); run = null; keepAwake(false);
+    if (audio && audio.c.state === "running") audio.c.suspend();
+    bx.hidden = true;
+    document.documentElement.classList.remove("csp-open");
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  document.addEventListener("click", (ev) => {
+    const b = ev.target.closest && ev.target.closest("[data-cs-breathe]");
+    if (b) { ev.preventDefault(); openBreathe(); }
+  });
+  document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && ev.isTrusted) closeBreathe(); });
+  document.addEventListener("visibilitychange", () => { if (document.hidden && run) finish(true); });
+  window.CuriousPicture = { open, close, breathe: openBreathe, ready: () => load().then((t) => !!(t && t.pic && t.pic.url)) };
   // A Home banner marked data-cs-banner shows today's picture behind its words (her ask, 2026-11-08: "you see the
   // picture already, and then on the picture you tap Just the picture", like Music and Morning Notes). Banners drawn
   // later (after the unlock, or on a new page) are found by watching the page. If the picture fails, the banner stays as it was.

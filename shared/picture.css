@@ -70,3 +70,35 @@ html.csp-ready .csp-pill[hidden] { display: inline-flex; }
 /* The header: a house before the app's name; tapping it always goes Home (her ask, 2026-11-08, like Dyslexia). */
 .cs-home { display: inline-flex; align-items: center; gap: 10px; }
 .cs-home svg { width: .8em; height: .8em; flex: none; }
+
+/* Breathe (data-cs-breathe, her ask 2026-11-08): full screen on today's picture, softly blurred and darkened. A circle grows
+   for 4 seconds as you breathe in and shrinks for 8 as you breathe out. Sizes 14 / 18 / 28 only. */
+.csb { position: fixed; inset: 0; z-index: 2147483001; display: flex; flex-direction: column; color: #fff; overflow: hidden;
+  font-family: "Nunito Sans", system-ui, -apple-system, "Segoe UI", sans-serif; background: #2c3a3f; animation: cspIn .35s ease; }
+.csb[hidden] { display: none; }
+.csb::before { content: ""; position: absolute; inset: -40px; background: var(--csp-img, none) center / cover no-repeat;
+  filter: blur(14px) brightness(.55) saturate(1.1); }
+.csb > * { position: relative; z-index: 1; }
+.csb-top { display: flex; justify-content: space-between; gap: 12px; padding: calc(14px + env(safe-area-inset-top)) 16px 0; }
+.csb-top button, .csb-picks button, .csb-stop { min-height: 44px; padding: 0 20px; border-radius: 999px; font: inherit; font-size: 18px; font-weight: 700;
+  cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.csb-close, .csb-picks button, .csb-stop { border: 0; background: rgba(255, 253, 247, .94); color: #242424; }
+.csb-sound { border: 1px solid rgba(255, 255, 255, .6); background: rgba(0, 0, 0, .3); color: #fff; }
+.csb-sound[aria-pressed="true"] { background: rgba(255, 255, 255, .22); }
+.csb-sound svg { width: 20px; height: 20px; }
+.csb button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.csb-mid { flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.csb-ring { position: relative; width: min(78vw, 340px); aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .55);
+  display: flex; align-items: center; justify-content: center; }
+.csb-ball { position: absolute; inset: 0; border-radius: 50%; transform: scale(.42); transition: transform 4s ease-in-out;
+  background: radial-gradient(circle at 40% 35%, rgba(255, 255, 255, .55), rgba(255, 255, 255, .18) 60%, rgba(255, 255, 255, .08));
+  box-shadow: 0 0 60px rgba(255, 255, 255, .25); }
+.csb-ball.full { transform: scale(1); }
+.csb-word { position: relative; font-size: 28px; font-weight: 700; text-align: center; text-shadow: 0 2px 12px rgba(0, 0, 0, .4); }
+.csb-panel { padding: 0 20px calc(28px + env(safe-area-inset-bottom)); text-align: center; }
+.csb-panel[hidden] { display: none; }
+.csb-panel h2 { margin: 0 0 8px; font-size: 28px; font-weight: 700; color: #fff; }
+.csb-panel p { margin: 0 auto 18px; max-width: 30em; font-size: 18px; line-height: 1.6; color: #fff; text-shadow: 0 1px 8px rgba(0, 0, 0, .4); }
+.csb-picks { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.csb-count { font-size: 18px; }
+[data-cs-breathe] { cursor: pointer; }
