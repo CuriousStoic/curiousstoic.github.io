@@ -44,3 +44,9 @@ html.csp-ready .csp-pill[hidden] { display: inline-flex; }
   cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, .12); }
 .csp-pill svg { width: 18px; height: 18px; flex: none; }
 .csp-pill:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+/* A Home banner with today's picture behind its words (data-cs-banner, her ask 2026-11-08). The wash is darker at the
+   bottom, where the words and the pill sit, so white text stays easy to read on any picture. */
+.csp-banner { background: linear-gradient(180deg, rgba(0, 0, 0, .28) 0%, rgba(0, 0, 0, .42) 45%, rgba(0, 0, 0, .66) 100%),
+  var(--csp-img) center / cover no-repeat !important; color: #fff; min-height: 340px; }
+.csp-banner h1, .csp-banner h2, .csp-banner p { color: #fff !important; text-shadow: 0 1px 10px rgba(0, 0, 0, .45); }

@@ -10,7 +10,7 @@
 
   const css = document.createElement("link");
   css.rel = "stylesheet";
-  css.href = "/shared/picture.css?v=2";
+  css.href = "/shared/picture.css?v=3";
   document.head.appendChild(css);
 
   function todayIso() {
@@ -90,5 +90,23 @@
   });
   document.addEventListener("keydown", (ev) => { if (ev.key === "Escape") close(); });
   window.CuriousPicture = { open, close, ready: () => load().then((t) => !!(t && t.pic && t.pic.url)) };
-  window.CuriousPicture.ready().then((ok) => { if (ok) document.documentElement.classList.add("csp-ready"); });
+  // A Home banner marked data-cs-banner shows today's picture behind its words (her ask, 2026-11-08: "you see the
+  // picture already, and then on the picture you tap Just the picture", like Music and Morning Notes). Banners drawn
+  // later (after the unlock, or on a new page) are found by watching the page. If the picture fails, the banner stays as it was.
+  function dressBanners(url) {
+    const css = "url('" + String(url).replace(/'/g, "%27") + "')";
+    const dress = (root) => {
+      if (!root.querySelectorAll) return;
+      const list = root.matches && root.matches("[data-cs-banner]") ? [root] : [];
+      list.push(...root.querySelectorAll("[data-cs-banner]"));
+      for (const b of list) if (!b.classList.contains("csp-banner")) { b.style.setProperty("--csp-img", css); b.classList.add("csp-banner"); }
+    };
+    dress(document);
+    new MutationObserver((ms) => { for (const m of ms) m.addedNodes.forEach(dress); }).observe(document.documentElement, { childList: true, subtree: true });
+  }
+  load().then((t) => {
+    if (!t || !t.pic || !t.pic.url) return;
+    document.documentElement.classList.add("csp-ready");
+    dressBanners(t.pic.url);
+  });
 })();
