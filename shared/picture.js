@@ -10,7 +10,7 @@
 
   const css = document.createElement("link");
   css.rel = "stylesheet";
-  css.href = "/shared/picture.css?v=4";
+  css.href = "/shared/picture.css?v=5";
   document.head.appendChild(css);
 
   function todayIso() {
@@ -104,9 +104,77 @@
     dress(document);
     new MutationObserver((ms) => { for (const m of ms) m.addedNodes.forEach(dress); }).observe(document.documentElement, { childList: true, subtree: true });
   }
+  // The picture card at the top of Home (her ask, 2026-11-08, like Music): the date, "Good morning" and the weather on
+  // today's picture, with the "Just the picture" button. An app adds <section class="csp-hero" data-cs-hero="key" hidden>
+  // ("visitor" for the sneak peek). Visitors get only the date and "Good morning, friend": no city, no weather.
+  // The name comes from Morning Notes on this phone (who chose "This is me" there), else "friend".
+  // The place: Morning Notes' last place on this phone, else that person's home city, else Seattle.
+  const PEOPLE = { aditya: ["Aditya", "sanfrancisco"], anoushka: ["Anoushka", "seattle"], amit: ["Amit", "seattle"], sangya: ["Sangya", "seattle"] };
+  const CITIES = { seattle: { name: "Seattle", lat: 47.6062, lon: -122.3321 }, sanfrancisco: { name: "San Francisco", lat: 37.7749, lon: -122.4194 } };
+  const WMO = { 0: "clear sky", 1: "mainly clear", 2: "partly cloudy", 3: "overcast", 45: "fog", 48: "icy fog", 51: "light drizzle", 53: "drizzle", 55: "heavy drizzle", 56: "freezing drizzle", 57: "freezing drizzle", 61: "light rain", 63: "rain", 65: "heavy rain", 66: "freezing rain", 67: "freezing rain", 71: "light snow", 73: "snow", 75: "heavy snow", 77: "snow grains", 80: "light showers", 81: "showers", 82: "heavy showers", 85: "snow showers", 86: "heavy snow showers", 95: "thunderstorm", 96: "thunderstorm with hail", 99: "thunderstorm with hail" };
+  const read = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  function reader() {
+    const me = PEOPLE[read("dmn.me") || ""];
+    if (me) return { name: me[0], city: CITIES[me[1]] };
+    try { const g = JSON.parse(read("dmn.guest") || "null"); if (g && g.name) return { name: String(g.name).split(" ")[0], city: g.place || null }; } catch (e) {}
+    return { name: "friend", city: null };
+  }
+  function place(who) {
+    try { const c = JSON.parse(read("dmn.where") || "null"); if (c && c.place && c.place.lat != null) return c.place; } catch (e) {}
+    return who.city || CITIES.seattle;
+  }
+  const greeting = (h) => (h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening");
+  function clothing(hi, lo) {
+    if (hi < 45) return "A warm coat, hat and gloves.";
+    if (hi < 55) return "A warm jacket all day.";
+    if (hi < 65) return "A light jacket all day.";
+    if (hi < 75) return lo < 58 ? "A light layer for the morning, short sleeves by afternoon." : "Short sleeves are fine all day.";
+    if (hi < 85) return "Short sleeves and sunglasses.";
+    return "Short sleeves, sunscreen and plenty of water.";
+  }
+  const IMG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>';
+  function fillHero(h, url) {
+    if (h.dataset.csDone) return;
+    h.dataset.csDone = "1";
+    const visitor = h.dataset.csHero === "visitor";
+    const who = visitor ? { name: "friend", city: null } : reader();
+    const now = new Date();
+    h.style.setProperty("--csp-img", "url('" + String(url).replace(/'/g, "%27") + "')");
+    h.innerHTML = "";
+    const pill = el("button", "csp-pill csp-hero-pill");
+    pill.type = "button";
+    pill.setAttribute("data-cs-picture", "");
+    pill.innerHTML = IMG + "<span>Just the picture</span>";
+    const date = el("div", "csp-hero-date", now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" }));
+    const greet = el("h2", "csp-hero-greet", greeting(now.getHours()) + ", " + who.name);
+    h.append(pill, date, greet);
+    h.hidden = false;
+    if (visitor) return;
+    const p = place(who), line = el("p", "csp-hero-line", p.name + " · checking the weather…");
+    h.appendChild(line);
+    const metric = p.metric === true || (p.cc && p.cc !== "US") || (p.country_code && p.country_code !== "US");
+    const deg = (f) => (metric ? Math.round((f - 32) * 5 / 9) + "°C" : Math.round(f) + "°F");
+    const q = new URLSearchParams({ latitude: p.lat, longitude: p.lon, daily: "temperature_2m_max,temperature_2m_min", current: "temperature_2m,weather_code", timezone: "auto", temperature_unit: "fahrenheit", forecast_days: "1" });
+    fetch("https://api.open-meteo.com/v1/forecast?" + q).then((r) => r.json()).then((w) => {
+      const c = w.current || {}, d = w.daily || {};
+      const hi = d.temperature_2m_max && d.temperature_2m_max[0], lo = d.temperature_2m_min && d.temperature_2m_min[0];
+      line.textContent = p.name + " · " + deg(c.temperature_2m) + ", " + (WMO[c.weather_code] || "") + " right now." + (hi != null && lo != null ? " " + clothing(hi, lo) : "");
+    }).catch(() => { line.textContent = p.name + " · weather unavailable right now."; });
+  }
+  function watch(sel, fn) {
+    const run = (root) => {
+      if (!root.querySelectorAll) return;
+      const list = root.matches && root.matches(sel) ? [root] : [];
+      list.push(...root.querySelectorAll(sel));
+      list.forEach(fn);
+    };
+    run(document);
+    new MutationObserver((ms) => { for (const m of ms) m.addedNodes.forEach(run); }).observe(document.documentElement, { childList: true, subtree: true });
+  }
   load().then((t) => {
     if (!t || !t.pic || !t.pic.url) return;
     document.documentElement.classList.add("csp-ready");
     dressBanners(t.pic.url);
+    watch("[data-cs-hero]", (h) => fillHero(h, t.pic.url));
   });
 })();

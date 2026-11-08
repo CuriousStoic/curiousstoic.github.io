@@ -50,3 +50,23 @@ html.csp-ready .csp-pill[hidden] { display: inline-flex; }
 .csp-banner { background: linear-gradient(180deg, rgba(0, 0, 0, .28) 0%, rgba(0, 0, 0, .42) 45%, rgba(0, 0, 0, .66) 100%),
   var(--csp-img) center / cover no-repeat !important; color: #fff; min-height: 340px; }
 .csp-banner h1, .csp-banner h2, .csp-banner p, .csp-banner .heroKicker { color: #fff !important; text-shadow: 0 1px 10px rgba(0, 0, 0, .45); }
+
+/* The picture card at the top of Home (data-cs-hero, her ask 2026-11-08, like Music): date, greeting, weather, and the
+   "Just the picture" button top right. Hidden until the picture is known, so a failed load leaves Home as it was. */
+.csp-hero { position: relative; display: flex; flex-direction: column; justify-content: flex-end; min-height: 340px;
+  margin: 0 0 20px; padding: 72px 24px 26px; border-radius: 20px; overflow: hidden; color: #fff;
+  background: linear-gradient(180deg, rgba(0, 0, 0, .12) 0%, rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, .6) 100%), var(--csp-img) center / cover no-repeat;
+  box-shadow: 0 18px 50px rgba(20, 24, 22, .18); }
+.csp-hero[hidden] { display: none; }
+.csp-hero .csp-hero-pill { display: inline-flex; position: absolute; top: 16px; right: 16px; margin: 0; background: rgba(0, 0, 0, .38); color: #fff;
+  border: 1px solid rgba(255, 255, 255, .5); box-shadow: none; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.csp-hero .csp-hero-pill:hover { background: rgba(0, 0, 0, .52); }
+.csp-hero-date { font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .95; margin: 0 0 6px;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .45); }
+.csp-hero .csp-hero-greet { margin: 0; color: #fff !important; font-size: 28px; font-weight: 700; line-height: 1.25;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, .4); }
+.csp-hero .csp-hero-line { margin: 8px 0 0; color: #fff !important; font-size: 16px; line-height: 1.5; text-shadow: 0 1px 8px rgba(0, 0, 0, .5); }
+@media (max-width: 640px) { .csp-hero { min-height: 46vh; max-height: 520px; padding: 70px 18px 22px; } }
+/* The header: a house before the app's name; tapping it always goes Home (her ask, 2026-11-08, like Dyslexia). */
+.cs-home { display: inline-flex; align-items: center; gap: 10px; }
+.cs-home svg { width: .8em; height: .8em; flex: none; }
