@@ -329,5 +329,7 @@
     document.documentElement.classList.add("csp-ready");
     dressBanners(t.pic.url);
     watch("[data-cs-hero]", (h) => fillHero(h, t.pic.url));
+    // Any element marked data-cs-bg gets today's picture as its background (the Breathe card in Morning Notes).
+    watch("[data-cs-bg]", (e) => { e.style.backgroundImage = "url('" + String(t.pic.url).replace(/'/g, "%27") + "')"; e.style.backgroundSize = "cover"; e.style.backgroundPosition = "center"; });
   });
 })();
