@@ -10,7 +10,7 @@
 
   const css = document.createElement("link");
   css.rel = "stylesheet";
-  css.href = "/shared/picture.css?v=1";
+  css.href = "/shared/picture.css?v=2";
   document.head.appendChild(css);
 
   function todayIso() {
@@ -72,7 +72,7 @@
       lastFocus = document.activeElement;
       if (!box) build(t);
       box.hidden = false;
-      box.classList.remove("whole");                      // it fills the screen at first, every time
+      box.classList.add("whole");                         // a phone held upright shows all of it first (her ask, 2026-11-08); a double-tap fills the screen
       box.querySelector("details").open = false;          // the card starts folded to its title
       document.documentElement.classList.add("csp-open");
       box.querySelector(".csp-back").focus();
