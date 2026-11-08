@@ -10,7 +10,7 @@
 
   const css = document.createElement("link");
   css.rel = "stylesheet";
-  css.href = "/shared/picture.css?v=6";
+  css.href = "/shared/picture.css?v=7";
   document.head.appendChild(css);
 
   function todayIso() {
@@ -93,7 +93,7 @@
   // ---------- Breathe: slow breathing on today's picture (her ask, 2026-11-08) ----------
   // In for 4 seconds through the nose, out for 8 slowly "as if through a straw": the breath out twice as long as the breath in
   // (pursed-lip breathing; Huberman: breaths out slow the heart). 5 breaths a minute. She picks 1, 3 or 5 minutes.
-  // Sound is off at first (like Instagram); the speaker turns on a soft made "om" tone on each breath out, and a chime at the end.
+  // Sound is off at first (like Instagram); the speaker turns on a singing bowl: a light bowl on each breath in, a deep bowl that rings through each breath out, 3 strikes at the end.
   // Any element with data-cs-breathe opens it.
   const IN_S = 4, OUT_S = 8;
   let bx = null, timers = [], audio = null, soundOn = false, wake = null, run = null;
@@ -106,37 +106,46 @@
     try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) {}   // iPhone: play even on silent
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return null;
-    const c = new AC(), master = c.createGain();
-    master.gain.value = 0.9; master.connect(c.destination);
-    audio = { c, master };
+    const c = new AC();
+    // Loud and even on a phone speaker: a gentle compressor, then full volume.
+    const comp = c.createDynamicsCompressor();
+    comp.threshold.value = -24; comp.knee.value = 12; comp.ratio.value = 4; comp.attack.value = 0.01; comp.release.value = 0.4;
+    const master = c.createGain(); master.gain.value = 1.1;
+    master.connect(comp); comp.connect(c.destination);
+    // A small hall: a made room echo (3 seconds of softly fading noise), mixed in under the dry sound.
+    const len = Math.floor(c.sampleRate * 3), ir = c.createBuffer(2, len, c.sampleRate);
+    for (let ch = 0; ch < 2; ch++) { const d = ir.getChannelData(ch); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3); }
+    const verb = c.createConvolver(); verb.buffer = ir;
+    const wet = c.createGain(); wet.gain.value = 0.45;
+    verb.connect(wet); wet.connect(master);
+    audio = { c, master, verb };
     return audio;
   }
-  function om(seconds) {               // a soft, low hum with gentle overtones, rising and fading with the breath out
+  // A singing bowl, struck softly (her ask, 2026-11-08: "a really beautiful, Buddhist kind of tone").
+  // Its overtones follow a measured Tibetan bowl (Stanford CCRMA, ICMC 2002: 186, 551, 1007, 1627, 2337 Hz, ratios
+  // 1 : 2.96 : 5.41 : 8.75 : 12.57). Each overtone is a pair a little out of tune, which gives a real bowl its slow
+  // shimmer, and the higher ones fade first. The base is raised to 220 Hz so a phone speaker can play it.
+  const BOWL = [[1, 1, 11, 1.1], [2.96, 0.8, 8, 1.7], [5.41, 0.5, 5.5, 2.3], [8.75, 0.28, 3.5, 2.9], [12.57, 0.14, 2.2, 3.4]];
+  function bowl(base, level, ring) {
     const a = soundOn && ctx(); if (!a) return;
-    const { c, master } = a, t = c.currentTime;
-    const g = c.createGain(), f = c.createBiquadFilter();
-    f.type = "lowpass"; f.frequency.value = 700;
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.22, t + 1.2);
-    g.gain.setValueAtTime(0.22, t + seconds - 2);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + seconds - 0.1);
-    g.connect(f); f.connect(master);
-    [[136.1, 1], [272.2, 0.3], [408.3, 0.12], [136.6, 0.5]].forEach(([hz, v]) => {
-      const o = c.createOscillator(), og = c.createGain();
-      o.type = "sine"; o.frequency.value = hz; og.gain.value = v;
-      o.connect(og); og.connect(g); o.start(t); o.stop(t + seconds);
+    const { c, master, verb } = a, t = c.currentTime + 0.02;
+    const out = c.createGain(); out.gain.value = level;
+    out.connect(master); out.connect(verb);
+    BOWL.forEach(([ratio, amp, decay, beat]) => {
+      const life = Math.min(decay, ring) ;
+      [-beat / 2, beat / 2].forEach((off) => {
+        const o = c.createOscillator(), g = c.createGain();
+        o.type = "sine"; o.frequency.value = base * ratio + off;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(amp * 0.5, t + 0.012);               // a soft mallet: quick but not sharp
+        g.gain.exponentialRampToValueAtTime(0.0001, t + life);
+        o.connect(g); g.connect(out); o.start(t); o.stop(t + life + 0.05);
+      });
     });
   }
-  function chime() {
-    const a = soundOn && ctx(); if (!a) return;
-    const { c, master } = a, t = c.currentTime;
-    [[528, 0.18], [792, 0.08]].forEach(([hz, v]) => {
-      const o = c.createOscillator(), g = c.createGain();
-      o.type = "sine"; o.frequency.value = hz;
-      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.05); g.gain.exponentialRampToValueAtTime(0.0001, t + 4);
-      o.connect(g); g.connect(master); o.start(t); o.stop(t + 4.1);
-    });
-  }
+  function om(seconds) { bowl(220, 0.55, 11); }          // the breath out: a deep bowl that rings through it
+  function inhaleCue() { bowl(440, 0.18, 4); }           // the breath in: a light, small bowl
+  function chime() { bowl(220, 0.5, 12); later(() => bowl(330, 0.35, 10), 1600); later(() => bowl(440, 0.25, 8), 3200); }   // the end: 3 strikes
   function setSound(on) {
     soundOn = on;
     const b = bx.querySelector(".csb-sound");
@@ -185,6 +194,7 @@
       if (!run) return;
       if (run.done >= run.total) return finish(false);
       word("Breathe in");
+      inhaleCue();
       ball.style.transitionDuration = IN_S + "s"; ball.classList.add("full");
       later(() => {
         word("Breathe out");
