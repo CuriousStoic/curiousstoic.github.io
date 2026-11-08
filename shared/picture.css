@@ -49,4 +49,4 @@ html.csp-ready .csp-pill[hidden] { display: inline-flex; }
    bottom, where the words and the pill sit, so white text stays easy to read on any picture. */
 .csp-banner { background: linear-gradient(180deg, rgba(0, 0, 0, .28) 0%, rgba(0, 0, 0, .42) 45%, rgba(0, 0, 0, .66) 100%),
   var(--csp-img) center / cover no-repeat !important; color: #fff; min-height: 340px; }
-.csp-banner h1, .csp-banner h2, .csp-banner p { color: #fff !important; text-shadow: 0 1px 10px rgba(0, 0, 0, .45); }
+.csp-banner h1, .csp-banner h2, .csp-banner p, .csp-banner .heroKicker { color: #fff !important; text-shadow: 0 1px 10px rgba(0, 0, 0, .45); }

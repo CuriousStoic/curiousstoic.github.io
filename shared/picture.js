@@ -10,7 +10,7 @@
 
   const css = document.createElement("link");
   css.rel = "stylesheet";
-  css.href = "/shared/picture.css?v=3";
+  css.href = "/shared/picture.css?v=4";
   document.head.appendChild(css);
 
   function todayIso() {
