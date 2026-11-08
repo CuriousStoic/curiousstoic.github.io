@@ -107,7 +107,8 @@
   // The picture card at the top of Home (her ask, 2026-11-08, like Music): the date, "Good morning" and the weather on
   // today's picture, with the "Just the picture" button. An app adds <section class="csp-hero" data-cs-hero="key" hidden>
   // ("visitor" for the sneak peek). Visitors get only the date and "Good morning, friend": no city, no weather.
-  // The name comes from Morning Notes on this phone (who chose "This is me" there), else "friend".
+  // The name: Morning Notes' "This is me" when this phone shares its storage (a home-screen app does not), else Sangya.
+  // "friend" is only for visitors, whose name is not known (her rule, 2026-11-08).
   // The place: Morning Notes' last place on this phone, else that person's home city, else Seattle.
   const PEOPLE = { aditya: ["Aditya", "sanfrancisco"], anoushka: ["Anoushka", "seattle"], amit: ["Amit", "seattle"], sangya: ["Sangya", "seattle"] };
   const CITIES = { seattle: { name: "Seattle", lat: 47.6062, lon: -122.3321 }, sanfrancisco: { name: "San Francisco", lat: 37.7749, lon: -122.4194 } };
@@ -117,7 +118,7 @@
     const me = PEOPLE[read("dmn.me") || ""];
     if (me) return { name: me[0], city: CITIES[me[1]] };
     try { const g = JSON.parse(read("dmn.guest") || "null"); if (g && g.name) return { name: String(g.name).split(" ")[0], city: g.place || null }; } catch (e) {}
-    return { name: "friend", city: null };
+    return { name: "Sangya", city: CITIES.seattle };       // anyone with the key: her own apps greet her (her rule, 2026-11-08)
   }
   function place(who) {
     try { const c = JSON.parse(read("dmn.where") || "null"); if (c && c.place && c.place.lat != null) return c.place; } catch (e) {}
